@@ -32,6 +32,7 @@ import pt.rumos.rumos.the.movie.domain.MovieResponse;
 @Path("/movies")
 public class MovieController {
     
+    static final private String API_KEY = "db10e7a8660d7d089fb952a7a4fe4d13";
 
     @Context
     private UriInfo context;
@@ -50,7 +51,7 @@ public class MovieController {
     @Path("/search")
     @Produces("application/json")
     public List<MovieResponse> searchMovie(@QueryParam("name") String name) throws IOException{
-        final String uri = "https://api.themoviedb.org/3/search/keyword?api_key=3d885f69e9747a37c64bc72ec966cf02&query="+name+"&page=1";
+        final String uri = "https://api.themoviedb.org/3/search/keyword?api_key="+ API_KEY +"&query="+name+"&page=1";
         
         CloseableHttpClient client = HttpClientBuilder.create().build();
         CloseableHttpResponse response = client.execute(new HttpGet(uri));
@@ -74,6 +75,62 @@ public class MovieController {
         return moviesFrontendResponse; 
         
     }
+    
+    @GET
+    @Path("/genre")
+    @Produces("application/json")
+    public List<MovieResponse> getMoviesByGenre(@QueryParam("genre") String genre, @QueryParam("year")String year) throws IOException{
+        
+        //https://api.themoviedb.org/3/discover/movie?with_genres=28&api_key=db10e7a8660d7d089fb952a7a4fe4d13&sort_by=vote_average.desc&vote_count.gte=8
+        final String uri = "https://api.themoviedb.org/3/discover/movie?with_genres=28" + year + "&sort_by=vote_average.desc&api_key="+API_KEY;
+
+         CloseableHttpClient client = HttpClientBuilder.create().build();
+         CloseableHttpResponse response = client.execute(new HttpGet(uri));
+         String bodyAsString = EntityUtils.toString(response.getEntity());
+
+         BestFilmsForYearResponse responseFromTMDBDTO = new GsonBuilder()
+                 .create()
+                 .fromJson(bodyAsString, BestFilmsForYearResponse.class);
+
+         List<Movie> moviesFromTMDB = responseFromTMDBDTO.getMovies();
+
+          List<MovieResponse> moviesFrontendResponse = new ArrayList<>();
+          for (Movie m : moviesFromTMDB) {
+              MovieResponse movie = new MovieResponse();
+              movie.setName(m.getName());
+              movie.setDescription(m.getOverview());
+              moviesFrontendResponse.add(movie);
+          }
+         return moviesFrontendResponse;
+    }
+    
+    @GET
+    @Path("/genre")
+    @Produces("application/json")
+    public List<MovieResponse> getMoviesByGenre(@QueryParam("genre") String genre) throws IOException{
+        
+        final String uri = "https://api.themoviedb.org/3/discover/movie?primary_release_year=" + genre + "&sort_by=vote_average.desc&api_key="+API_KEY;
+
+         CloseableHttpClient client = HttpClientBuilder.create().build();
+         CloseableHttpResponse response = client.execute(new HttpGet(uri));
+         String bodyAsString = EntityUtils.toString(response.getEntity());
+
+         BestFilmsForYearResponse responseFromTMDBDTO = new GsonBuilder()
+                 .create()
+                 .fromJson(bodyAsString, BestFilmsForYearResponse.class);
+
+         List<Movie> moviesFromTMDB = responseFromTMDBDTO.getMovies();
+
+          List<MovieResponse> moviesFrontendResponse = new ArrayList<>();
+          for (Movie m : moviesFromTMDB) {
+              MovieResponse movie = new MovieResponse();
+              movie.setName(m.getName());
+              movie.setDescription(m.getOverview());
+              moviesFrontendResponse.add(movie);
+          }
+         return moviesFrontendResponse;
+    }
+    
 
      @GET
      @Path("/best")
