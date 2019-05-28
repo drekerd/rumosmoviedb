@@ -3,7 +3,6 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package pt.rumos.rumos.the.movie;
 
 import com.google.gson.annotations.SerializedName;
@@ -16,19 +15,21 @@ import lombok.Data;
  */
 @Data
 public class BestFilmsForYearResponse {
-   int page;
-        
-        @SerializedName("total_results")
-        int totalResults;
-        @SerializedName("total_pages")
-        int totalPages;
-        @SerializedName("results")
-        List<Movie> movies;
 
-        @Data
-        public class Movie {
-            @SerializedName("title")
-            String name;
-            String overview;
-        } 
+    int page;
+
+    @SerializedName("total_results")
+    int totalResults;
+    @SerializedName("total_pages")
+    int totalPages;
+    @SerializedName("results")
+    List<Movie> movies;
+
+    @Data
+    public class Movie {
+
+        @SerializedName("title")
+        String name;
+       // String overview;
+    }
 }

@@ -10,6 +10,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -26,6 +28,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
 import pt.rumos.rumos.the.movie.BestFilmsForYearResponse.Movie;
+import pt.rumos.rumos.the.movie.database.controllers.MoviesDBJpaController;
 import pt.rumos.rumos.the.movie.domain.MovieRequest;
 import pt.rumos.rumos.the.movie.domain.MovieResponse;
 
@@ -43,7 +46,19 @@ public class MovieController {
     @Path("/test")
     @Produces("text/plan")
     public String test(@QueryParam("name") String name){
+        insertIntoTableTest("name");
         return name;
+    }
+    
+    private void insertIntoTableTest(String name){
+        BestFilmsForYearResponse best = new BestFilmsForYearResponse();
+        BestFilmsForYearResponse.Movie movie = best.new Movie();
+        
+        movie.setName(name);
+        
+        EntityManagerFactory emf = Persistence.createEntityManagerFactory("pt.rumos_rumos-the-movie_war_1.0.0-SNAPSHOTPU");
+        MoviesDBJpaController moviesController = new MoviesDBJpaController(emf);
+        moviesController.create(movie);
     }
     
     @GET
@@ -96,7 +111,7 @@ public class MovieController {
           for (Movie m : moviesFromTMDB) {
               MovieResponse movie = new MovieResponse();
               movie.setName(m.getName());
-              movie.setDescription(m.getOverview());
+              //movie.setDescription(m.getOverview());
               moviesFrontendResponse.add(movie);
           }
          return moviesFrontendResponse;
